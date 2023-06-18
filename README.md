@@ -1,88 +1,23 @@
-<!DOCTYPE html>
-<html>
+# Challenge Dev Django
 
-<head>
-    <meta charset="UTF-8">
-    <title>Challenge Dev Django</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.5;
-            margin: 0;
-            padding: 0;
-        }
+## Pré-requisitos
+Certifique-se de ter os seguintes itens instalados no seu sistema:
 
-        h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
+- Docker
+- Docker Compose
 
-        h2 {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
+## Instruções de instalação
+1. Crie um arquivo chamado `.env` seguindo o `.env.example` do repositório.
 
-        p {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
+2. Execute o comando `docker-compose up --build` para iniciar o projeto.
 
-        code {
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            display: inline-block;
-            padding: 2px 6px;
-        }
+3. Para acessar o painel de administração, utilize as seguintes credenciais:
+   - Nome de usuário: admin
+   - Senha: admin123
 
-        pre {
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            white-space: pre-wrap;
-        }
+4. Rota para responder: `http://localhost:8000/response/id_da_proposta/`
 
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-    </style>
-</head>
+5. O Admin do Django monta a proposta.
 
-<body>
-    <h1>Challenge Dev Django</h1>
-
-    <h2>Pré-requisitos</h2>
-    <p>Certifique-se de ter os seguintes itens instalados no seu sistema:</p>
-    <ul>
-        <li>Docker</li>
-        <li>Docker Compose</li>
-    </ul>
-
-    <h2>Instruções de instalação</h2>
-
-    <ol>
-        <li>Crie um arquivo chamado <code>.env</code> seguindo o exemplo do arquivo <code>.env.example</code> no repositório.</li>
-        <li>Execute o comando <code>docker-compose up --build</code> para iniciar o projeto.</li>
-        <li>Para acessar o painel de administração, utilize as seguintes credenciais:</li>
-    </ol>
-    <ul>
-        <li>Nome de usuário: <code>admin</code></li>
-        <li>Senha: <code>admin123</code></li>
-    </ul>
-
-    <p>Para acessar a rota de resposta, utilize o seguinte formato de URL:</p>
-    <pre><code>http://localhost:8000/response/id_da_proposta/</code></pre>
-
-    <p>O administrador do Django é responsável por montar a proposta.</p>
-
-    <h2>Conclusão</h2>
-    <p>Siga as instruções acima para configurar e executar o projeto. Se tudo for feito corretamente, você poderá
-        acessar o painel de administração e utilizar a rota para responder à proposta.</p>
-</body>
-
-</html>
+## Conclusão
+Siga as instruções acima para configurar e executar o projeto. Se tudo for feito corretamente, você poderá acessar o painel de administração e utilizar a rota para responder à proposta.
