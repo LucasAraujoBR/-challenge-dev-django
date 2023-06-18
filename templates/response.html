@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Empréstimo Pessoal</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #formProposta {
+            width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #confirmButton {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Proposta de Empréstimo Pessoal</h1>
+    <div id="formContainer">
+        <form id="formProposta">
+        </form>
+        <button type="button" id="confirmButton">Confirmar</button>
+    </div>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <script>
+        
+        // Função para verificar a situação da proposta e renderizar a página correspondente
+        function renderizarPaginaStatus(situacao) {
+            var body = document.querySelector("body");
+            body.innerHTML = ""; // Limpar o conteúdo existente
+
+            // Adicionar o CSS personalizado para a página de status
+            var css = document.createElement("style");
+            css.innerText = `
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f8f8f8;
+                }
+
+                .status-container {
+                    text-align: center;
+                    margin-top: 100px;
+                }
+
+                .status-message {
+                    font-size: 24px;
+                    color: #333;
+                    margin-bottom: 20px;
+                }
+
+                .status-value {
+                    font-size: 48px;
+                    font-weight: bold;
+                }
+            `;
+            body.appendChild(css);
+
+            // Adicionar o conteúdo da página de status
+            var container = document.createElement("div");
+            container.classList.add("status-container");
+
+            var message = document.createElement("div");
+            message.classList.add("status-message");
+            message.innerText = "A proposta já foi avaliada e está";
+
+            var value = document.createElement("div");
+            value.classList.add("status-value");
+            value.innerText = situacao;
+
+            container.appendChild(message);
+            container.appendChild(value);
+            body.appendChild(container);
+        }
+
+        // Função para fazer uma requisição GET ao carregar a página
+        function fazerRequisicaoGet() {
+            var urlParams = new URL(window.location.href);
+            var id = urlParams.pathname.split("/")[2];
+
+            if (id) {
+                $.ajax({
+                    url: "http://localhost:8000/api/get_proposal/" + id + "/",
+                    type: "GET",
+                    success: function (data) {
+                        console.log("Requisição GET bem-sucedida!");
+                        console.log(data);
+                        if (data.proposal_situation !== "Em análise") {
+                            renderizarPaginaStatus(data.proposal_situation);
+                        } else {
+                            montarCampos(data);
+                        }
+                    },
+                    error: function () {
+                        console.log("Erro na requisição GET!");
+                        renderizarPagina404();
+                    }
+                });
+            } else {
+                console.log("ID não encontrado na URL!");
+                renderizarPagina404();
+            }
+        }
+
+        // Função para montar os campos dinamicamente
+        function montarCampos(data) {
+            var form = document.getElementById("formProposta");
+            var fields = data.field;
+
+            fields.forEach(function(field) {
+                var label = document.createElement("label");
+                label.textContent = field.label;
+
+                var input = document.createElement("input");
+                input.type = "text";
+                input.name = field.slug;
+
+                form.appendChild(label);
+                form.appendChild(input);
+            });
+        }
+        
+        
+                // Função para renderizar a página de erro 404
+        function renderizarPagina404() {
+            var body = document.querySelector("body");
+            body.innerHTML = ""; // Limpar o conteúdo existente
+
+            // Adicionar o CSS personalizado
+            var css = document.createElement("style");
+            css.innerText = `
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f8f8f8;
+                }
+
+                .container {
+                    text-align: center;
+                    margin-top: 100px;
+                }
+
+                .error-code {
+                    font-size: 48px;
+                    font-weight: bold;
+                    color: #ff4040;
+                    margin-bottom: 20px;
+                }
+
+                .error-message {
+                    font-size: 24px;
+                    color: #333;
+                }
+            `;
+            body.appendChild(css);
+
+            // Adicionar o conteúdo da página de erro
+            var container = document.createElement("div");
+            container.classList.add("container");
+
+            var errorCode = document.createElement("div");
+            errorCode.classList.add("error-code");
+            errorCode.innerText = "404";
+
+            var errorMessage = document.createElement("div");
+            errorMessage.classList.add("error-message");
+            errorMessage.innerText = "Página não encontrada";
+
+            container.appendChild(errorCode);
+            container.appendChild(errorMessage);
+            body.appendChild(container);
+        }
+
+
+
+        // Função para fazer uma requisição POST quando o botão for clicado
+        function fazerRequisicaoPost() {
+            var form = document.getElementById("formProposta");
+            var formData = new FormData(form);
+            var jsonData = {};
+          
+            // Converter os dados do formulário para um objeto JSON
+            formData.forEach(function (value, key) {
+              jsonData[key] = value;
+            });
+          
+            var csrfToken = getCookie('csrftoken'); // Obter o valor do token CSRF do cookie
+          
+            var camposVazios = false;
+          
+            // Verificar se há campos vazios
+            var inputs = form.getElementsByTagName("input");
+            for (var i = 0; i < inputs.length; i++) {
+              if (inputs[i].value === "") {
+                camposVazios = true;
+                break;
+              }
+            }
+          
+            if (!camposVazios) {
+              var urlParams = new URL(window.location.href);
+              var id = urlParams.pathname.split("/")[2];
+          
+              if (id) {
+                jsonData["id"] = id; // Adicionar o ID da URL ao objeto JSON
+                $.ajax({
+                  url: "http://localhost:8000/api/response/",
+                  type: "POST",
+                  data: JSON.stringify(jsonData), // Enviar os dados como JSON
+                  contentType: "application/json", // Definir o cabeçalho Content-Type como application/json
+                  headers: { 'X-CSRFToken': csrfToken }, // Adicionar o token CSRF ao cabeçalho
+                  success: function (data) {
+                    console.log("Requisição POST bem-sucedida!");
+                    console.log(data);
+                  },
+                  error: function () {
+                    console.log("Erro na requisição POST!");
+                  },
+                });
+              } else {
+                console.log("ID não encontrado na URL!");
+              }
+            } else {
+              alert("Preencha todos os campos!");
+            }
+          }
+
+          function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+              var cookies = document.cookie.split(';');
+              for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+                }
+              }
+            }
+            return cookieValue;
+          }
+        // Chamar a função de requisição GET ao carregar a página
+        fazerRequisicaoGet();
+
+        // Adicionar o evento de clique no botão para a requisição POST
+        document.getElementById("confirmButton").addEventListener("click", fazerRequisicaoPost);
+    </script>
+</body>
+</html>
